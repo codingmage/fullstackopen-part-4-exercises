@@ -12,7 +12,7 @@ blogsRouter.post('/', async (request, response) => {
     /* const blog = new Blog(request.body) */
 
     const body = request.body
-
+    
     const noLikes = !body.likes
 
     const blog = new Blog({
