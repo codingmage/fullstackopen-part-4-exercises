@@ -51,6 +51,36 @@ test('check id property', async () => {
     /* expect(response.body[0].id).toBeDefined() */
 })
 
+describe('POST check', () => {
+
+    test('blog successfully added', async () => {
+
+        const newBlog = {
+            "title": "Would You Rather...?",
+            "author": "Neo",
+            "url": "wyr.com",
+            "likes": 100
+        }
+
+        await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(201)
+            .expect('Content-Type', /application\/json/)
+
+        const response = await api.get('/api/blogs')
+
+        const currentBlogs = response.body
+
+        console.log(currentBlogs)
+
+        expect(currentBlogs).toHaveLength(initialBlogList.length + 1)
+
+    })
+
+
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
