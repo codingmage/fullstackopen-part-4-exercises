@@ -72,9 +72,33 @@ describe('POST check', () => {
 
         const currentBlogs = response.body
 
-        console.log(currentBlogs)
+        /* console.log(currentBlogs) */
 
         expect(currentBlogs).toHaveLength(initialBlogList.length + 1)
+
+    })
+
+    test('check for likes', async () => {
+
+        const blogWithoutLikes = {
+            "title": "No likes?",
+            "author": "Big Blue Head",
+            "url": "mm.com"
+        }
+
+        await api
+            .post('/api/blogs')
+            .send(blogWithoutLikes)
+            .expect(201)
+            .expect('Content-Type', /application\/json/)
+
+        const response = await api.get('/api/blogs')
+
+        const blogsWithLikeless = response.body
+
+        /* console.log(blogsWithLikeless) */
+
+        expect(blogsWithLikeless[2].likes).toBe(0)
 
     })
 
