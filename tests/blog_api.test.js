@@ -38,8 +38,17 @@ test('get blogs as json', async () => {
 
 test('all blogs are returned', async () => {
     const response = await api.get('/api/blogs')
-
     expect(response.body).toHaveLength(initialBlogList.length)
+})
+
+test('check id property', async () => {
+    const response = await api.get('/api/blogs')
+
+    for (let blog of response.body) {
+        expect(blog.id).toBeDefined()
+    }
+
+    /* expect(response.body[0].id).toBeDefined() */
 })
 
 afterAll(async () => {
