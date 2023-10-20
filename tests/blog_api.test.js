@@ -117,7 +117,7 @@ describe('POST check', () => {
 
     test('do not save if URL missing', async() => {
         const blogWithoutURL = {
-            "title": "No lURL?",
+            "title": "No URL?",
             "author": "Big Blue Head",
         }
 
@@ -131,8 +131,47 @@ describe('POST check', () => {
 
         expect(unchangedList).toHaveLength(initialBlogList.length)
     })
+})
 
+test('DELETE check', async() => {
+    const blogsAtStart = await api.get('/api/blogs')
+    const firstBlog = blogsAtStart.body[0]
 
+    await api.delete(`/api/blogs/${firstBlog.id}`).expect(204)
+
+    const newResponse = await api.get('/api/blogs')
+
+    const blogsAfterDeletion = newResponse.body
+
+    expect(blogsAfterDeletion).toHaveLength(initialBlogList.length - 1)
+
+    const eachBlogTitle = blogsAfterDeletion.map(blog => blog.title)
+
+    expect(eachBlogTitle).not.toContain(firstBlog.title)
+})
+
+test('PUT check', async () => {
+    const oldBlogs = await api.get('/api/blogs')
+    const blogToUpdate = oldBlogs.body[0]
+
+    const updatedBlog = {
+        "title": "Your movie is awesome",
+        "author": "Floating Head",
+        "url": "ymia.com",
+        "likes": 777
+    }
+
+    await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send(updatedBlog)
+        .expect(200)
+
+    const updatedBlogs = await api.get('/api/blogs')
+    const blogNowUpdated = updatedBlogs.body[0]
+
+    expect(updatedBlogs.body).toHaveLength(initialBlogList.length)
+    expect(blogNowUpdated.likes).toBe(777)
+        
 })
 
 afterAll(async () => {
