@@ -212,28 +212,87 @@ describe('initial single user', () => {
       const usernames = finalUsers.map(u => u.username)
       expect(usernames).toContain(newUser.username)
     })
-  
-/*     test('creation fails with proper statuscode and message if username already taken', async () => {
-      const usersAtStart = await helper.usersInDb()
-  
-      const newUser = {
-        username: 'root',
-        name: 'Superuser',
-        password: 'salainen',
-      }
-  
-      const result = await api
-        .post('/api/users')
-        .send(newUser)
-        .expect(400)
-        .expect('Content-Type', /application\/json/)
-  
-      expect(result.body.error).toContain('expected `username` to be unique')
-  
-      const usersAtEnd = await helper.usersInDb()
-      expect(usersAtEnd).toHaveLength(usersAtStart.length)
-    }) */
-  })  
+  })
+
+describe('user validation errors', () => {
+    beforeEach(async () => {
+        await User.deleteMany({})
+    
+        const passwordHash = await bcrypt.hash('spooky', 10)
+        const user = new User({ username: 'root', passwordHash })
+    
+        await user.save()
+      })
+
+    test('fails if username already exists', async () => {
+        const usersAtStart = await User.find({})
+        const usersJSON = usersAtStart.map(user => user.toJSON())
+    
+        const newUser = {
+          username: 'root',
+          name: 'userWillFail',
+          password: 'valid',
+        }
+    
+        const result = await api
+          .post('/api/users')
+          .send(newUser)
+          .expect(400)
+          .expect('Content-Type', /application\/json/)
+    
+        expect(result.body.error).toContain('expected `username` to be unique')
+    
+        const usersAtEnd = await User.find({})
+        const usersEndJSON = usersAtEnd.map(user => user.toJSON())
+        expect(usersEndJSON).toHaveLength(usersJSON.length)
+    })
+
+    test('fails if username is invalid', async () => {
+        const usersAtStart = await User.find({})
+        const usersJSON = usersAtStart.map(user => user.toJSON())
+    
+        const newUser = {
+          username: 'no',
+          name: 'userWillFail',
+          password: 'valid',
+        }
+    
+        const result = await api
+          .post('/api/users')
+          .send(newUser)
+          .expect(400)
+          .expect('Content-Type', /application\/json/)
+    
+        expect(result.body.error).toContain('User validation failed')
+    
+        const usersAtEnd = await User.find({})
+        const usersEndJSON = usersAtEnd.map(user => user.toJSON())
+        expect(usersEndJSON).toHaveLength(usersJSON.length)
+    })
+
+    test('fails if password is invalid', async () => {
+        const usersAtStart = await User.find({})
+        const usersJSON = usersAtStart.map(user => user.toJSON())
+    
+        const newUser = {
+          username: 'valid',
+          name: 'userWillFail',
+          password: 'iv',
+        }
+    
+        const result = await api
+          .post('/api/users')
+          .send(newUser)
+          .expect(400)
+          .expect('Content-Type', /application\/json/)
+    
+        expect(result.body.error).toContain('User validation failed')
+    
+        const usersAtEnd = await User.find({})
+        const usersEndJSON = usersAtEnd.map(user => user.toJSON())
+        expect(usersEndJSON).toHaveLength(usersJSON.length)
+    })
+})
 
 afterAll(async () => {
   await mongoose.connection.close()
