@@ -5,14 +5,6 @@ const jwt = require('jsonwebtoken')
 
 // use express-async-errors instead of try/catch
 
-const getTokenFrom = request => {  
-  const authorization = request.get('authorization')  
-  if (authorization && authorization.startsWith('Bearer ')) {
-    return authorization.replace('Bearer ', '')
-  }  
-  return null
-}
-
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', {username: 1, name: 1, id: 1})
   response.json(blogs)
@@ -22,7 +14,7 @@ blogsRouter.post('/', async (request, response) => {
 
     const body = request.body
  
-    const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)  
+    const decodedToken = jwt.verify(request.token, process.env.SECRET) 
     if (!decodedToken.id) {
       return response.status(401).json({ error: 'token invalid' })
     }  
@@ -44,7 +36,7 @@ blogsRouter.post('/', async (request, response) => {
     const savedBlog = await blog.save()
     user.blogs = [...user.blogs, blog]
     await user.save()
-    response.status(201).json(savedBlog)
+    await response.status(201).json(savedBlog)
 
     /* Try and catch alternative:
     try {
@@ -54,12 +46,6 @@ blogsRouter.post('/', async (request, response) => {
         next(error)
     }
      */
-  
-    /* blog
-      .save()
-      .then(result => {
-        response.status(201).json(result)
-      }) */
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
