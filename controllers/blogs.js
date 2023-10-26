@@ -21,8 +21,6 @@ blogsRouter.post('/', async (request, response) => {
     
     const user = await User.findById(decodedToken.id)
     
-    /* const user = await User.findById(body.userId) */
-    
     const noLikes = !body.likes
 
     const blog = new Blog({
@@ -30,7 +28,7 @@ blogsRouter.post('/', async (request, response) => {
       author: body.author,
       url: body.url,
       likes: noLikes ? 0 : body.likes,
-      user: body.userId
+      user: decodedToken.id
     })
 
     const savedBlog = await blog.save()
@@ -49,8 +47,24 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
-  await Blog.findByIdAndRemove(request.params.id)
-  response.status(204).end()
+
+  const verifiedToken = jwt.verify(request.token, process.env.SECRET)
+
+  if (!verifiedToken.id) {
+    return response.status(401).json({ error: 'token invalid' })
+  }  
+  
+  const thisBlog = await Blog.findById(request.params.id)
+
+  if (verifiedToken.id.toString() === thisBlog.user.toString()) {
+    await Blog.findByIdAndRemove(request.params.id)
+    response.status(204).end()
+  } else {
+    response.status(401).json({ error: 'user does not match'})
+  }
+
+  /* await Blog.findByIdAndRemove(request.params.id) */
+  /* response.status(204).end() */
 })
 
 blogsRouter.put('/:id', async (request, response) => {
