@@ -58,13 +58,14 @@ describe('POST check', () => {
     test('blog successfully added', async () => {
         const newBlog = {
             "title": "Would You Rather...?",
-            "author": "Neo",
+            "author": "Neos",
             "url": "wyr.com",
             "likes": 100
         }
 
         await api
             .post('/api/blogs')
+            .set('Authorization', "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hZ2UiLCJpZCI6IjY1M2JmZDkxNTZlZGZlNDJiYTMwZDAyYiIsImlhdCI6MTY5ODQzNDQ0OSwiZXhwIjoxNjk4NDM4MDQ5fQ.7RDKVR_FshFHhy7LjA1zC8OFMitHcMwLEA741cNbSQo")
             .send(newBlog)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -72,7 +73,7 @@ describe('POST check', () => {
         const response = await api.get('/api/blogs')
         const currentBlogs = response.body
         /* console.log(currentBlogs) */
-
+        console.log(currentBlogs)
         expect(currentBlogs).toHaveLength(initialBlogList.length + 1)
 
     })
@@ -86,6 +87,7 @@ describe('POST check', () => {
 
         await api
             .post('/api/blogs')
+            .set('Authorization', "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hZ2UiLCJpZCI6IjY1M2JmZDkxNTZlZGZlNDJiYTMwZDAyYiIsImlhdCI6MTY5ODQzNDQ0OSwiZXhwIjoxNjk4NDM4MDQ5fQ.7RDKVR_FshFHhy7LjA1zC8OFMitHcMwLEA741cNbSQo")
             .send(blogWithoutLikes)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -108,6 +110,7 @@ describe('POST check', () => {
 
         await api
             .post('/api/blogs')
+            .set('Authorization', "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hZ2UiLCJpZCI6IjY1M2JmZDkxNTZlZGZlNDJiYTMwZDAyYiIsImlhdCI6MTY5ODQzNDQ0OSwiZXhwIjoxNjk4NDM4MDQ5fQ.7RDKVR_FshFHhy7LjA1zC8OFMitHcMwLEA741cNbSQo")
             .send(blogWithoutTitle)
             .expect(400)
 
@@ -125,6 +128,7 @@ describe('POST check', () => {
 
         await api
             .post('/api/blogs')
+            .set('Authorization', "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hZ2UiLCJpZCI6IjY1M2JmZDkxNTZlZGZlNDJiYTMwZDAyYiIsImlhdCI6MTY5ODQzNDQ0OSwiZXhwIjoxNjk4NDM4MDQ5fQ.7RDKVR_FshFHhy7LjA1zC8OFMitHcMwLEA741cNbSQo")
             .send(blogWithoutURL)
             .expect(400)
 
@@ -132,6 +136,45 @@ describe('POST check', () => {
         const unchangedList = unchangedBlogs.body
 
         expect(unchangedList).toHaveLength(initialBlogList.length)
+    })
+
+    test('do not save if user does not match', async() => {
+        const newBlog = {
+            "title": "Would You Rather...?",
+            "author": "Neos",
+            "url": "wyr.com",
+            "likes": 100
+        }
+
+        await api
+            .post('/api/blogs')
+            .set('Authorization', "Bearer faketoken")
+            .send(newBlog)
+            .expect(401)
+            .expect('Content-Type', /application\/json/)
+
+        const response = await api.get('/api/blogs')
+        const currentBlogs = response.body
+        expect(currentBlogs).toHaveLength(initialBlogList.length)
+    })
+
+    test('do not save if token does not exist', async() => {
+        const newBlog = {
+            "title": "Would You Rather...?",
+            "author": "Neos",
+            "url": "wyr.com",
+            "likes": 100
+        }
+
+        await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(401)
+            .expect('Content-Type', /application\/json/)
+
+        const response = await api.get('/api/blogs')
+        const currentBlogs = response.body
+        expect(currentBlogs).toHaveLength(initialBlogList.length)
     })
 })
 
