@@ -65,7 +65,7 @@ describe('POST check', () => {
 
         await api
             .post('/api/blogs')
-            .set('Authorization', "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hZ2UiLCJpZCI6IjY1M2JmZDkxNTZlZGZlNDJiYTMwZDAyYiIsImlhdCI6MTY5ODQzNDQ0OSwiZXhwIjoxNjk4NDM4MDQ5fQ.7RDKVR_FshFHhy7LjA1zC8OFMitHcMwLEA741cNbSQo")
+            .set('Authorization', process.env.TEST_TOKEN)
             .send(newBlog)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -87,7 +87,7 @@ describe('POST check', () => {
 
         await api
             .post('/api/blogs')
-            .set('Authorization', "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hZ2UiLCJpZCI6IjY1M2JmZDkxNTZlZGZlNDJiYTMwZDAyYiIsImlhdCI6MTY5ODQzNDQ0OSwiZXhwIjoxNjk4NDM4MDQ5fQ.7RDKVR_FshFHhy7LjA1zC8OFMitHcMwLEA741cNbSQo")
+            .set('Authorization', process.env.TEST_TOKEN)
             .send(blogWithoutLikes)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -110,7 +110,7 @@ describe('POST check', () => {
 
         await api
             .post('/api/blogs')
-            .set('Authorization', "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hZ2UiLCJpZCI6IjY1M2JmZDkxNTZlZGZlNDJiYTMwZDAyYiIsImlhdCI6MTY5ODQzNDQ0OSwiZXhwIjoxNjk4NDM4MDQ5fQ.7RDKVR_FshFHhy7LjA1zC8OFMitHcMwLEA741cNbSQo")
+            .set('Authorization', process.env.TEST_TOKEN)
             .send(blogWithoutTitle)
             .expect(400)
 
@@ -128,7 +128,7 @@ describe('POST check', () => {
 
         await api
             .post('/api/blogs')
-            .set('Authorization', "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hZ2UiLCJpZCI6IjY1M2JmZDkxNTZlZGZlNDJiYTMwZDAyYiIsImlhdCI6MTY5ODQzNDQ0OSwiZXhwIjoxNjk4NDM4MDQ5fQ.7RDKVR_FshFHhy7LjA1zC8OFMitHcMwLEA741cNbSQo")
+            .set('Authorization', process.env.TEST_TOKEN)
             .send(blogWithoutURL)
             .expect(400)
 
