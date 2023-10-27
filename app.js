@@ -17,7 +17,7 @@ app.use(express.json())
 
 app.use(middleware.getToken)
 
-app.use('/api/blogs', blogsRouter)
+app.use('/api/blogs', middleware.getUser, blogsRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
 
